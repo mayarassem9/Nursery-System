@@ -9,7 +9,7 @@ const multer=require("./Middleware/MulterMidWare");
 const morgan=require("morgan");
 const mongoose=require("mongoose");
 require('dotenv').config();
-server.use(morgan("tiny"));
+
 
 //----------settings
 //server.use(express.json());
@@ -31,7 +31,9 @@ server.listen(port,()=>{console.log("server is listening...")});
 
 //----------settings
 server.use(express.json());
-server.use(multer.single("image"))
+server.use(express.urlencoded({extended:true}));
+server.use(multer.single("image"));
+server.use(morgan("tiny"));
 
 
 //listen to port number 

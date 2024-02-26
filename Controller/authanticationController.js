@@ -1,45 +1,51 @@
-const JWT=require("jsonwebtoken");
-const bcrypt=require("bcrypt");
-const admin=require("../Model/adminSchema");
-const Teacher=require("../Model/teacherSchema");
-
+const JWT = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
-exports.login=(req,res,next)=>{
-    const {email,password}=req.body;
-    Teacher.findOne({email})
-    .then((teacher)=>{
-        if(teacher){
-            let user=teacher;
-            return bcrypt.compare(password,teacher.password);
-        }
-        return admin.findOne({email})
-        .then((admin)=>{
-            if (!admin) {
-                let error = new Error("Invalid email or password");
-                error.statusCode = 401;
-                throw error;
-            }
-            user=admin;
-            return bcrypt.compare(password,admin.password);
-        }).then((isMatch)=>{
-            if (!isMatch) {
-                let error = new Error("Invalid email or password");
-                error.statusCode = 401;
-                throw error;
-            }
-            const token = JWT.sign(
-                {
-                    id: user._id,
-                    fullname: user.fullName,
-                    role: user instanceof Teacher ? "teacher" : "admin",
-                },
-                process.env.SECRET_KEY,
-                { expiresIn: "1h" }
-            );
-            res.status(200).json({message:"Logged in succeffully",token});
-        })
-    }).catch((error)=>{
-        next(error);
-    })
+const admin = require("../Model/adminSchema");
+const Teacher = require("../Model/teacherSchema");
+
+exports.login = (req, res, next) => {
+    const { email, password } = req.body; // Destructure for cleaner access
+    console.log(process.env.password);
+    if (email === process.env.email && password == process.env.password) {
+        const token = JWT.sign({ email, role: "admin" }, process.env.SECRET_KEY, {
+            expiresIn: "1h",
+        }); // Optional: add expiration
+        return res.status(200).json({ token: token });
+    } else {
+        console.log("name :>> ", email);
+        Teacher.findOne({ email })
+            .then((teacher) => {
+                if (!teacher) {
+                    // If no teacher is found with the provided name
+                    return res.status(401).json({ message: "Incorrect name" });
+                }
+
+                // Compare provided password with hashed password
+                bcrypt
+                    .compare(password, teacher.password)
+                    .then((isMatch) => {
+                        if (!isMatch) {
+                            // If the password doesn't match
+                            return res.status(401).json({ message: "Incorrect Password" });
+                        }
+
+                        // Password matches, sign the token
+                        const token = JWT.sign(
+                            { id: teacher._id, role: "teacher" },
+                            process.env.SECRET_KEY,
+                            { expiresIn: "1h" }
+                        ); // Optional: add expiration
+                        res.status(200).json({ token: token });
+                    })
+                    .catch((err) => {
+                        // Handle bcrypt error
+                        console.error(err);
+                        res
+                            .status(500)
+                            .json({ message: "Server error during authentication" });
+                    });
+            })
+    }
 }

@@ -8,6 +8,7 @@ const authorizationMidWare = require("./Middleware/authorizationMidWare");
 const multer = require("./Middleware/MulterMidWare");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const swagger =require("./swagger");
 require('dotenv').config();
 
 
@@ -30,11 +31,12 @@ mongoose.connect(process.env.url).then(() => {
 // server.use(morgan("tiny"));
 
 //----------settings
+
 server.use(express.json());
+swagger(server,port);
 server.use(express.urlencoded({ extended: true }));
 server.use(multer.single("image"));
 server.use(morgan("tiny"));
-
 
 //listen to port number 
 // const port=process.env.PORT||8080;
@@ -54,6 +56,7 @@ server.use(authorizationMidWare);
 server.use(teacherRoute);
 server.use(childRoute);
 server.use(classRouter);
+
 
 
 //not found middleware

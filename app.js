@@ -1,13 +1,13 @@
-const express=require("express");
-const server=express();
-const teacherRoute=require("./Routes/teacherRoute");
-const childRoute=require("./Routes/childRoute");
-const classRouter=require("./Routes/classRouter");
-const authenticateRoute=require("./Routes/authanticationRoute");
-const authorizationMidWare=require("./Middleware/authorizationMidWare");
-const multer=require("./Middleware/MulterMidWare");
-const morgan=require("morgan");
-const mongoose=require("mongoose");
+const express = require("express");
+const server = express();
+const teacherRoute = require("./Routes/teacherRoute");
+const childRoute = require("./Routes/childRoute");
+const classRouter = require("./Routes/classRouter");
+const authenticateRoute = require("./Routes/authanticationRoute");
+const authorizationMidWare = require("./Middleware/authorizationMidWare");
+const multer = require("./Middleware/MulterMidWare");
+const morgan = require("morgan");
+const mongoose = require("mongoose");
 require('dotenv').config();
 
 
@@ -15,23 +15,23 @@ require('dotenv').config();
 //server.use(express.json());
 
 //listen to port number 
-const port=process.env.PORT||8080;
+const port = process.env.PORT || 8080;
 
-mongoose.connect(process.env.url).then(()=>{
-console.log("connected to database");
+mongoose.connect(process.env.url).then(() => {
+    console.log("connected to database");
 
-server.listen(port,()=>{console.log("server is listening...")});
+    server.listen(port, () => { console.log("server is listening...") });
 
 
-}).catch((error)=>{
-    console.log("Error connecting to database",error);
+}).catch((error) => {
+    console.log("Error connecting to database", error);
 });
 
 // server.use(morgan("tiny"));
 
 //----------settings
 server.use(express.json());
-server.use(express.urlencoded({extended:true}));
+server.use(express.urlencoded({ extended: true }));
 server.use(multer.single("image"));
 server.use(morgan("tiny"));
 
@@ -57,13 +57,13 @@ server.use(classRouter);
 
 
 //not found middleware
-server.use((req,res)=>{
+server.use((req, res) => {
     console.log("not found");
-    res.status(404).json({message:"not found",})
+    res.status(404).json({ message: "not found", })
 });
 //error handeling midlle
-server.use((error,req,res,next)=>{
-    res.status(error.statusCode || 500).json({message:error+"",})
+server.use((error, req, res, next) => {
+    res.status(error.statusCode || 500).json({ message: error.message + "", })
 });
 
 

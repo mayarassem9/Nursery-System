@@ -10,5 +10,5 @@ exports.bodyvalidate=[
 ]
 
 exports.paramValidate = [
-    param("_id").isInt().withMessage("Id must be a number")
+    param("id").isInt().withMessage("Id must be a number")
 ]

@@ -13,7 +13,7 @@ exports.getAllclasses=(req,res,next)=>{
 
 exports.getClassById=(req,res,next)=>{
     const id=req.params.id;
-    Class.findById({_id:id})
+    Class.findById(id)
     .populate("supervisor")
     .populate("children")
     .then((classes)=>{

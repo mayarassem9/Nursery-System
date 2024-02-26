@@ -7,8 +7,7 @@ const Teacher = require("../Model/teacherSchema");
 
 exports.login = (req, res, next) => {
     const { email, password } = req.body; // Destructure for cleaner access
-    console.log(process.env.password);
-    if (email === process.env.email && password == process.env.password) {
+    if (email === process.env.admin && password == process.env.password) {
         const token = JWT.sign({ email, role: "admin" }, process.env.SECRET_KEY, {
             expiresIn: "1h",
         }); // Optional: add expiration
@@ -18,8 +17,7 @@ exports.login = (req, res, next) => {
         Teacher.findOne({ email })
             .then((teacher) => {
                 if (!teacher) {
-                    // If no teacher is found with the provided name
-                    return res.status(401).json({ message: "Incorrect name" });
+                    return res.status(401).json({ message: "Incorrect email" });
                 }
 
                 // Compare provided password with hashed password
